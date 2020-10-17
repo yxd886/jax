@@ -169,8 +169,8 @@ if __name__ == "__main__":
   replicated_op_state = tree_map(replicate_array, op_state)
   for i in range(num_steps):
       #params, treedef = tree_flatten(params)
-      new_batch = next(batches)
       start_time = time.time()
+      new_batch = next(batches)
       replicated_op_state = spmd_update( np.array([i]*num_devices),replicated_op_state, new_batch)
       end_time = time.time() - start_time
       print("time:",end_time)
