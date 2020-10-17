@@ -149,34 +149,29 @@ if __name__ == "__main__":
     return opt_update(i, grad(loss)(params, batch), opt_state)
 
   @partial(pmap, axis_name='batch')
-  def spmd_update( params, batch):
+  def spmd_update( i,op_state, batch):
 
     #params = tree_unflatten(treedef, params)
+    params = get_params(op_state)
     grads = grad(loss)(params, batch)
     leaves, local_treedef = tree_flatten(grads)
     # We compute the total gradients, summing across the device-mapped axis,
     # using the `lax.psum` SPMD primitive, which does a fast all-reduce-sum.
     grads = [lax.psum(dw, 'batch') for dw in leaves]
     grads = tree_unflatten(local_treedef, grads)
+    op_state = opt_update(i, grads, op_state)
 
-    return grads
+    return op_state
 
   replicate_array = lambda x: np.broadcast_to(x, (num_devices,) + x.shape)
 
   op_state = opt_init(init_params)
-
+  replicated_op_state = tree_map(replicate_array, op_state)
   for i in range(num_steps):
-      params = get_params(op_state)
       #params, treedef = tree_flatten(params)
-      replicated_params = tree_map(replicate_array, params)
-      start_time = time.time()
       new_batch = next(batches)
-      print(new_batch[0].shape)
-      print(new_batch[1].shape)
-      grads = spmd_update( replicated_params, new_batch)
-      grads = tree_map(lambda x: x[0], grads)
-      op_state = opt_update(i, grads, op_state)
-
+      start_time = time.time()
+      replicated_op_state = spmd_update( np.array([i]*num_devices),replicated_op_state, new_batch)
       end_time = time.time() - start_time
       print("time:",end_time)
 
