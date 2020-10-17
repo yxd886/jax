@@ -83,7 +83,7 @@ def ResNet50(num_classes):
 if __name__ == "__main__":
   rng_key = random.PRNGKey(0)
 
-  batch_size = 8
+  batch_size = 64
   num_classes = 1001
   input_shape = (224, 224, 3, batch_size)
   step_size = 0.1
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     target_class = jnp.argmax(targets, axis=-1)
     predicted_class = jnp.argmax(predict_fun(params, inputs), axis=-1)
     return jnp.mean(predicted_class == target_class)
-
+  
   def synth_batches():
     rng = npr.RandomState(0)
     while True:
@@ -120,6 +120,10 @@ if __name__ == "__main__":
     return opt_update(i, grad(loss)(params, batch), opt_state)
 
   opt_state = opt_init(init_params)
+  import time
   for i in range(num_steps):
-    opt_state = update(i, opt_state, next(batches))
+    next_batch = next(batches)
+    start = time.time()
+    opt_state = update(i, opt_state, next_batch)
+    print("per-iteration time:",time.time()-start)
   trained_params = get_params(opt_state)

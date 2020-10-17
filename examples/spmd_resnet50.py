@@ -94,7 +94,7 @@ def ResNet50(num_classes):
 if __name__ == "__main__":
   rng_key = random.PRNGKey(0)
 
-  batch_size = 32*4
+  batch_size = 64*4
   num_classes = 1001
   input_shape = (224, 224, 3, batch_size)
   step_size = 0.1
@@ -122,8 +122,6 @@ if __name__ == "__main__":
     while True:
       images = rng.rand(*input_shape).astype('float32')
       labels = rng.randint(num_classes, size=(batch_size, 1))
-      print("in",images.shape)
-      print("in",labels.shape)
       onehot_labels = labels == jnp.arange(num_classes)
 
       batch_size_per_device, ragged = divmod(images.shape[-1], num_devices)
@@ -132,8 +130,6 @@ if __name__ == "__main__":
           raise ValueError(msg.format(batch_size, num_devices))
       shape_prefix = (num_devices, )
       shape_postfix = (batch_size_per_device,)
-      print("in_shape_prefix",shape_prefix)
-      print("in_shape_postfix",shape_postfix)
       images = images.reshape(shape_prefix + images.shape[:-1]+shape_postfix)
       labels = labels.reshape(shape_prefix + shape_postfix+labels.shape[-1:])
       
@@ -169,8 +165,8 @@ if __name__ == "__main__":
   replicated_op_state = tree_map(replicate_array, op_state)
   for i in range(num_steps):
       #params, treedef = tree_flatten(params)
-      start_time = time.time()
       new_batch = next(batches)
+      start_time = time.time()
       replicated_op_state = spmd_update( np.array([i]*num_devices),replicated_op_state, new_batch)
       end_time = time.time() - start_time
       print("time:",end_time)
