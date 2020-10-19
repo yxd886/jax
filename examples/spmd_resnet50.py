@@ -145,7 +145,7 @@ if __name__ == "__main__":
     return opt_update(i, grad(loss)(params, batch), opt_state)
 
   @partial(pmap, axis_name='batch')
-  def spmd_update( i,op_state, batch):
+  def allreduce_spmd_update( i,op_state, batch):
 
     #params = tree_unflatten(treedef, params)
     params = get_params(op_state)
@@ -159,16 +159,54 @@ if __name__ == "__main__":
 
     return op_state
 
+  @partial(pmap, axis_name='batch')
+  def ps_spmd_update( params, batch):
+    grads = grad(loss)(params, batch)
+    return grads
   replicate_array = lambda x: np.broadcast_to(x, (num_devices,) + x.shape)
+  allreduce = True
 
-  op_state = opt_init(init_params)
-  replicated_op_state = tree_map(replicate_array, op_state)
-  for i in range(num_steps):
+  @jit
+  def ps_pre_process(op_state):
+    params = get_params(op_state)
+    replicated_op_params = tree_map(replicate_array, params)
+    return replicated_op_params
+
+  @jit
+  def ps_post_process(grads,op_state,i):
+    grads = tree_map(lambda x: jnp.sum(x,axis=0), grads)
+    op_state = opt_update(i, grads, op_state)
+    return op_state
+
+
+
+  if allreduce:
+    op_state = opt_init(init_params)
+    replicated_op_state = tree_map(replicate_array, op_state)
+    for i in range(num_steps):
       #params, treedef = tree_flatten(params)
       new_batch = next(batches)
       start_time = time.time()
-      replicated_op_state = spmd_update( np.array([i]*num_devices),replicated_op_state, new_batch)
+      replicated_op_state = allreduce_spmd_update( np.array([i]*num_devices),replicated_op_state, new_batch)
       end_time = time.time() - start_time
       print("time:",end_time)
+  else:
+    op_state = opt_init(init_params)
+    for i in range (num_steps):
+      new_batch = next(batches)
+      start_time = time.time()
+      replicated_op_params = ps_pre_process(op_state)
+      grads = ps_spmd_update(replicated_op_params,new_batch)
+      op_state = ps_post_process(grads,op_state,i)
+      end_time = time.time() - start_time
+      print("time:",end_time)
+
+
+
+
+
+
+
+
 
 
