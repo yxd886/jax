@@ -191,7 +191,7 @@ if __name__ == "__main__":
     for i in range(num_devices):
       params = jax.device_put(get_params(op_state), jax.devices()[i])
       _grad = grad(loss)(params, batch_list[i])
-    op_state = jax.device_put(opt_update(k, _grad, op_state),jax.devices()[0])
+    op_state = opt_update(k, _grad, op_state)
     return op_state
 
 
