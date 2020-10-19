@@ -135,9 +135,17 @@ if __name__ == "__main__":
       
       yield images, labels
 
+  def ps_synth_batches():
+    rng = npr.RandomState(0)
+    while True:
+      images = rng.rand(*input_shape).astype('float32')
+      labels = rng.randint(num_classes, size=(batch_size, 1))
+      onehot_labels = labels == jnp.arange(num_classes)
+      yield images, onehot_labels
 
   opt_init, opt_update, get_params = optimizers.momentum(step_size, mass=0.9)
   batches = synth_batches()
+  ps_batches = ps_synth_batches()
 
   @jit
   def update(i, opt_state, batch):
@@ -178,12 +186,11 @@ if __name__ == "__main__":
     return op_state
 
   @jit
-  def ps_loop_process(op_state,k,new_batch):
+  def ps_loop_process(op_state,k,batch_list):
     grads = []
     for i in range(num_devices):
       params = jax.device_put(get_params(op_state), jax.devices()[i])
-      batch = jax.device_put((new_batch[0][i:i+batch_size-1],new_batch[1][i:i+batch_size-1]),jax.devices()[i])
-      _grad = grad(loss)(params, batch)
+      _grad = grad(loss)(params, batch_list[i])
       _grad, local_treedef = tree_flatten(_grad)
       grads.append(_grad)
     concat_grads = jnp.concatenate(grads,axis=1)
@@ -221,9 +228,11 @@ if __name__ == "__main__":
       print("time:",end_time)
     '''
     for i in range (num_steps):
-      new_batch = next(batches)
+      batches_list = []
+      for i in range(num_devices):
+        batches_list.append(jax.device_put(next(ps_batches),jax.devices()[i]))
       start_time = time.time()
-      op_state = ps_loop_process(op_state,i,new_batch)
+      op_state = ps_loop_process(op_state,i,batches_list)
       end_time = time.time() - start_time
       print("time:",end_time)
 
