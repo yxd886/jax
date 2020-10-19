@@ -182,7 +182,7 @@ if __name__ == "__main__":
     grads = []
     for i in range(num_devices):
       params = jax.device_put(get_params(op_state), jax.devices()[i])
-      batch = jax.device_put(new_batch[i:i+batch_size-1],jax.devices()[i])
+      batch = jax.device_put((new_batch[0][i:i+batch_size-1],new_batch[1][i:i+batch_size-1]),jax.devices()[i])
       _grad = grad(loss)(params, batch)
       _grad, local_treedef = tree_flatten(_grad)
       grads.append(_grad)
