@@ -163,8 +163,6 @@ if __name__ == "__main__":
   def ps_spmd_update( params, batch):
     grads = grad(loss)(params, batch)
     return grads
-  replicate_array = lambda x: np.broadcast_to(x, (num_devices,) + x.shape)
-  allreduce = True
 
   @jit
   def ps_pre_process(op_state):
@@ -180,6 +178,9 @@ if __name__ == "__main__":
 
 
 
+  replicate_array = lambda x: jnp.broadcast_to(x, (num_devices,) + x.shape)
+  allreduce = False
+
   if allreduce:
     op_state = opt_init(init_params)
     replicated_op_state = tree_map(replicate_array, op_state)
@@ -187,7 +188,7 @@ if __name__ == "__main__":
       #params, treedef = tree_flatten(params)
       new_batch = next(batches)
       start_time = time.time()
-      replicated_op_state = allreduce_spmd_update( np.array([i]*num_devices),replicated_op_state, new_batch)
+      replicated_op_state = allreduce_spmd_update( jnp.array([i]*num_devices),replicated_op_state, new_batch)
       end_time = time.time() - start_time
       print("time:",end_time)
   else:
