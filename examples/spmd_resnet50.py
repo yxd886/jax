@@ -188,7 +188,7 @@ if __name__ == "__main__":
   @jit
   def ps_loop_process(op_state,k,batch_list):
     grads = []
-    op_state = jax.device_put(get_params(op_state), jax.devices()[0])
+    op_state = jax.device_put(op_state, jax.devices()[0])
     for i in range(num_devices):
       params = jax.device_put(get_params(op_state), jax.devices()[i])
       _grad = jax.device_put(grad(loss)(params, batch_list[i]), jax.devices()[i])
