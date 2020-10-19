@@ -191,12 +191,7 @@ if __name__ == "__main__":
     for i in range(num_devices):
       params = jax.device_put(get_params(op_state), jax.devices()[i])
       _grad = grad(loss)(params, batch_list[i])
-      _grad, local_treedef = tree_flatten(_grad)
-      grads.append(jnp.array(_grad))
-    concat_grads = jnp.concatenate(grads,axis=1)
-    grads = list(jnp.sum(concat_grads,axis=1))
-    grads = tree_unflatten(local_treedef,grads)
-    op_state = jax.device_put(opt_update(k, grads, op_state),jax.devices()[0])
+    op_state = jax.device_put(opt_update(k, _grad, op_state),jax.devices()[0])
     return op_state
 
 
