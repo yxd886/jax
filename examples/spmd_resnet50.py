@@ -177,6 +177,22 @@ if __name__ == "__main__":
     op_state = opt_update(i, grads, op_state)
     return op_state
 
+  @jit
+  def ps_loop_process(op_state,k,new_batch):
+    grads = []
+    for i in range(num_devices):
+      params = jax.device_put(get_params(op_state), jax.devices()[i])
+      batch = jax.device_put(new_batch[i:i+batch_size-1],jax.devices()[i])
+      _grad = grad(loss)(params, batch)
+      _grad, local_treedef = tree_flatten(_grad)
+      grads.append(_grad)
+    concat_grads = jnp.concatenate(grads,axis=1)
+    grads = jnp.sum(concat_grads,axis=1)
+    grads = tree_unflatten(local_treedef,grads)
+    op_state = jax.device_put(opt_update(k, grads, op_state),jax.devices()[0])
+    return op_state
+
+
 
 
   replicate_array = lambda x: jnp.broadcast_to(x, (num_devices,) + x.shape)
@@ -193,7 +209,8 @@ if __name__ == "__main__":
       end_time = time.time() - start_time
       print("time:",end_time)
   else:
-    op_state = opt_init(init_params)
+    op_state = jax.device_put(opt_init(init_params), jax.devices()[0])
+    '''
     for i in range (num_steps):
       new_batch = next(batches)
       start_time = time.time()
@@ -202,6 +219,16 @@ if __name__ == "__main__":
       op_state = ps_post_process(grads,op_state,i)
       end_time = time.time() - start_time
       print("time:",end_time)
+    '''
+    for i in range (num_steps):
+      new_batch = next(batches)
+      start_time = time.time()
+      op_state = ps_loop_process(op_state,i,new_batch)
+      end_time = time.time() - start_time
+      print("time:",end_time)
+
+
+
 
 
 
