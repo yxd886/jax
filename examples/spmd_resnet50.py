@@ -94,7 +94,7 @@ def ResNet50(num_classes):
 if __name__ == "__main__":
   rng_key = random.PRNGKey(0)
 
-  batch_size = 64*4
+  batch_size = 64
   num_classes = 1001
   input_shape = (224, 224, 3, batch_size)
   step_size = 0.1
