@@ -34,7 +34,7 @@ from jax.tree_util import tree_map,tree_flatten,tree_unflatten
 from jax import lax
 import jax.numpy as jnp
 import numpy.random as npr
-
+import jax
 import jax.numpy as jnp
 from jax import jit, grad, random
 from jax.experimental import optimizers
@@ -164,13 +164,14 @@ if __name__ == "__main__":
     grads = grad(loss)(params, batch)
     return grads
 
-  @jit
+
+  @partial(jit, device=jax.devices()[0])
   def ps_pre_process(op_state):
     params = get_params(op_state)
     replicated_op_params = tree_map(replicate_array, params)
     return replicated_op_params
 
-  @jit
+  @partial(jit, device=jax.devices()[0])
   def ps_post_process(grads,op_state,i):
     grads = tree_map(lambda x: jnp.sum(x,axis=0), grads)
     op_state = opt_update(i, grads, op_state)
