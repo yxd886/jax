@@ -43,6 +43,23 @@ from jax.experimental.stax import (AvgPool, BatchNorm, Conv, Dense, FanInSum,
                                    FanOut, Flatten, GeneralConv, Identity,
                                    MaxPool, Relu, LogSoftmax)
 
+
+
+import ctypes
+_cudart = ctypes.CDLL('libcudart.so')
+
+def cu_prof_start():
+  ret = _cudart.cudaProfilerStart()
+  if ret != 0:
+    raise Exception('cudaProfilerStart() returned %d' % ret)
+
+
+def cu_prof_stop():
+  ret = _cudart.cudaProfilerStop()
+  if ret != 0:
+    raise Exception('cudaProfilerStop() returned %d' % ret)
+
+
 def ConvBlock(kernel_size, filters, strides=(2, 2)):
   ks = kernel_size
   filters1, filters2, filters3 = filters
@@ -226,6 +243,8 @@ if __name__ == "__main__":
       print("time:",end_time)
     '''
     for i in range (num_steps):
+      if i==3:
+        cu_prof_start()
       batches_list = []
       for i in range(num_devices):
         batches_list.append(jax.device_put(next(ps_batches),jax.devices()[i]))
@@ -233,6 +252,8 @@ if __name__ == "__main__":
       op_state = ps_loop_process(op_state,i,batches_list)
       end_time = time.time() - start_time
       print("time:",end_time)
+      if i==3:
+        cu_prof_stop()
 
 
 
