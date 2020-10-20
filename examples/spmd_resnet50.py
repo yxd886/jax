@@ -225,9 +225,13 @@ if __name__ == "__main__":
     replicated_op_state = tree_map(replicate_array, op_state)
     for i in range(num_steps):
       #params, treedef = tree_flatten(params)
+      if i==3:
+        cu_prof_start()
       new_batch = next(batches)
       start_time = time.time()
       replicated_op_state = allreduce_spmd_update( jnp.array([i]*num_devices),replicated_op_state, new_batch)
+      if i == 3:
+        cu_prof_stop()
       end_time = time.time() - start_time
       print("time:",end_time)
   else:
