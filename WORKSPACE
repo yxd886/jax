@@ -26,20 +26,20 @@ http_archive(
 # b) get the sha256 hash of the commit by running:
 #    curl -L https://github.com/tensorflow/tensorflow/archive/<git hash>.tar.gz | sha256sum
 #    and update the sha256 with the result.
-http_archive(
-    name = "org_tensorflow",
-    sha256 = "c868259c92a669743f77c6cdc450a1b92bf01ac9f814825264e6adebd0acdd6e",
-    strip_prefix = "tensorflow-4ace926c663be8ecd13505cd4316b7b3380008af",
-    urls = [
-        "https://github.com/tensorflow/tensorflow/archive/4ace926c663be8ecd13505cd4316b7b3380008af.tar.gz",
-    ],
-)
+#http_archive(
+#    name = "org_tensorflow",
+#    sha256 = "c868259c92a669743f77c6cdc450a1b92bf01ac9f814825264e6adebd0acdd6e",
+#    strip_prefix = "tensorflow-4ace926c663be8ecd13505cd4316b7b3380008af",
+#    urls = [
+#        "https://github.com/tensorflow/tensorflow/archive/4ace926c663be8ecd13505cd4316b7b3380008af.tar.gz",
+#    ],
+#)
 
 # For development, one can use a local TF repository instead.
-# local_repository(
-#    name = "org_tensorflow",
-#    path = "tensorflow",
-# )
+local_repository(
+    name = "org_tensorflow",
+    path = "../tensorflow",
+)
 
 load("@org_tensorflow//tensorflow:workspace.bzl", "tf_workspace", "tf_bind")
 
