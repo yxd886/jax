@@ -264,7 +264,7 @@ def xla_primitive_callable(prim, *arg_specs: Tuple[core.AbstractValue,
       tuple(handler(*bs) for handler, bs in zip(handlers, _partition_outputs(aval_out, bufs)))
   tuple_args = len(avals) > 100
   tuple_args = False
-  print("bbbbbbbbb")
+  print("-------xla_primitive_callable")
   if prim in initial_style_translations:
     nreps = initial_style_primitive_replicas(params)
   else:
@@ -680,7 +680,7 @@ def _xla_callable(fun: lu.WrappedFun, device, backend, name, donated_invars, *ar
 
   tuple_args = len(abstract_args) > 100  # pass long arg lists as tuple for TPU
   tuple_args = False
-  print("aaaaaaaa")
+  print("-------_xla_callable")
 
   c = xb.make_computation_builder("jit_{}".format(fun.__name__))
   xla_consts = _xla_consts(c, consts)

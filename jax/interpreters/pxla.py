@@ -634,6 +634,8 @@ def parallel_callable(fun, backend, axis_name, axis_size, global_axis_size,
   axis_env = xla.AxisEnv(num_global_replicas, (axis_name,), (global_axis_size,), devices)
 
   tuple_args = len(sharded_avals) > 100  # pass long arg lists as tuple for TPU
+  tuple_args = False
+  print("-------------parallel_callable")
 
   c = xb.make_computation_builder("pmap_{}".format(fun.__name__))
   xla_consts = map(partial(xb.constant, c), consts)
@@ -1051,6 +1053,8 @@ def _soft_pmap_callable(fun, axis_name, axis_size, mapped_invars, *avals):
 
   tuple_args = len(avals) > 100  # pass long arg lists as tuple for TPU
 
+  tuple_args = False
+  print("--------------_soft_pmap_callable")
   c = xb.make_computation_builder("soft_pmap_{}".format(fun.__name__))
   xla_consts = map(partial(xb.constant, c), consts)
   chunked_avals = [core.unmapped_aval(chunk_size, aval) if m else aval
