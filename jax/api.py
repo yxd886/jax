@@ -600,7 +600,7 @@ def _xla_computation(
   donate_argnums = rebase_donate_argnums(donate_argnums, static_argnums)
 
   fun_name = getattr(fun, "__name__", "unknown")
-
+  tuple_args = False
 
   def make_axis_env(nreps):
     if axis_env is None:
@@ -660,6 +660,8 @@ def _xla_computation(
     c = xb.make_computation_builder("xla_computation_{}".format(fun_name))
     xla_consts = map(partial(xb.constant, c), consts)
     should_tuple = tuple_args if tuple_args is not None else (len(avals) > 100)
+    should_tuple = False
+    print("------computation_maker")
     xla_args, donated_invars = xla._xla_callable_args(
         c, avals, should_tuple, partitions=in_parts_flat, donated_invars=donated_invars)
     out_nodes = xla.jaxpr_subcomp(
