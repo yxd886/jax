@@ -600,7 +600,7 @@ def _xla_computation(
   donate_argnums = rebase_donate_argnums(donate_argnums, static_argnums)
 
   fun_name = getattr(fun, "__name__", "unknown")
-
+  tuple_args = False
 
   def make_axis_env(nreps):
     if axis_env is None:

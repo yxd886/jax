@@ -705,6 +705,8 @@ def parallel_callable(fun, backend, axis_name, axis_size, global_axis_size,
       device_assignment=device_assignment,
       use_spmd_partitioning=use_spmd_partitioning,
   )
+
+  tuple_args = False
   compile_options.parameter_is_tupled_arguments = tuple_args
   compiled = xla.backend_compile(backend, built, compile_options)
 

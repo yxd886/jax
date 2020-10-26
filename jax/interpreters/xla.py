@@ -307,6 +307,7 @@ def _device_from_arg_devices(devices: Sequence[Optional[Device]]) -> Optional[De
 
 @cache()
 def primitive_computation(prim, axis_env, backend, tuple_args, *avals, **params):
+  tuple_args = False
   c = xb.make_computation_builder(f"primitive_computation_{prim.name}")
   c.set_op_metadata(xc.OpMetadata(
       op_type=prim.name,
@@ -703,6 +704,7 @@ def _xla_callable(fun: lu.WrappedFun, device, backend, name, donated_invars, *ar
       num_replicas=nreps,
       num_partitions=1,
       device_assignment=(device.id,) if device else None)
+
   options.parameter_is_tupled_arguments = tuple_args
   compiled = backend_compile(backend, built, options)
   if nreps == 1:
@@ -715,6 +717,7 @@ def set_up_aliases(c, xla_args, out_tuple, donated_args, tuple_args):
   # First for every input array add it to `donations` iff it is a member of
   # `donated_args`.
   donations = defaultdict(deque)
+  tuple_args = False
   for arg_index, arg in enumerate(xla_args):
     if donated_args[arg_index]:
       for param_index, element in flatten_shape(c.GetShape(arg)):
@@ -763,6 +766,7 @@ def _xla_callable_args(
     partitions: Optional[Sequence[Optional[Sequence[int]]]] = None,
     donated_invars = None):
   assert partitions is None or len(partitions) == len(avals)
+  tuple_args = False
   if not tuple_args:
     if replicated is None:
       replicated = [None] * len(avals)

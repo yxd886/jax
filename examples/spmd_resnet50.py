@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
 
   replicate_array = lambda x: jnp.broadcast_to(x, (num_devices,) + x.shape)
-  allreduce = False
+  allreduce = True
 
   if allreduce:
     op_state = opt_init(init_params)
