@@ -241,7 +241,7 @@ def cache(call: Callable):
     key = (fun.transforms, fun.params, args)
     result = cache.get(key, None)
     if result is not None:
-      print("----key found")
+      #print("----key found")
       ans, stores = result
       fun.populate_stores(stores)
     else:
