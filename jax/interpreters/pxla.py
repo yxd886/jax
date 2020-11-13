@@ -494,11 +494,11 @@ import time
 def xla_pmap_impl(fun: lu.WrappedFun, *args, backend, axis_name, axis_size,
                   global_axis_size, devices, name, mapped_invars, donated_invars):
   abstract_args = unsafe_map(xla.abstractify, args)
-  begin = time.time()
+  #begin = time.time()
   compiled_fun = parallel_callable(fun, backend, axis_name, axis_size,
                                    global_axis_size, devices, name, mapped_invars,
                                    donated_invars, *abstract_args)
-  print("---------compile time:",time.time()-begin)
+  #print("---------compile time:",time.time()-begin)
   return compiled_fun(*args)
 
 @lu.cache
