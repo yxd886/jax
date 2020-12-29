@@ -73,3 +73,20 @@ apple_support_dependencies()
 load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 
 bazel_version_repository(name = "bazel_version")
+
+
+
+new_local_repository(
+name = "python_linux",
+path = "/home/net/.conda/envs/jax",
+build_file_content = """
+cc_library(
+name = "python37-lib",
+srcs = ["lib/libpython3.7m.so"],
+hdrs = glob(["include/python3.7m/*.h"]),
+includes = ["include/python3.7m"],
+visibility = ["//visibility:public"],
+)
+"""
+)
+
