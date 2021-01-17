@@ -91,17 +91,17 @@ visibility = ["//visibility:public"],
 )
 
 
-new_local_repository(
-name = "openmpi",
-path = "/usr/local/openmpi",
-build_file_content = """
-cc_library(
-name = "openmpi-lib",
-srcs = ["lib/libmpi.so","lib/libmpi_mpifh.so"],
-hdrs = glob(["include/*.h"]),
-includes = ["include"],
-visibility = ["//visibility:public"],
-)
-"""
-)
+#new_local_repository(
+#name = "openmpi",
+#path = "/usr/local/openmpi",
+#build_file_content = """
+#cc_library(
+#name = "openmpi-lib",
+#srcs = ["lib/libmpi.so","lib/libmpi_mpifh.so"],
+#hdrs = glob(["include/*.h"]),
+#includes = ["include"],
+#visibility = ["//visibility:public"],
+#)
+#"""
+#)
 
