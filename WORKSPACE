@@ -106,7 +106,7 @@ visibility = ["//visibility:public"],
 )
 
 new_local_repository(
-name = "curl",
+name = "opencurl",
 path = "/usr/",
 build_file_content = """
 cc_library(
