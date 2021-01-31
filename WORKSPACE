@@ -105,3 +105,16 @@ visibility = ["//visibility:public"],
 """
 )
 
+new_local_repository(
+name = "curl",
+path = "/usr/",
+build_file_content = """
+cc_library(
+name = "curl-lib",
+srcs = ["lib/x86_64-linux-gnu/libcurl.so"],
+hdrs = glob(["include/x86_64-linux-gnu/curl/*.h"]),
+includes = ["include/x86_64-linux-gnu/curl"],
+visibility = ["//visibility:public"],
+)
+"""
+)
