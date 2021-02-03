@@ -216,9 +216,9 @@ build --cxxopt=-std=c++14
 build --host_cxxopt=-std=c++14
 
 
-#build --copt="-g" 
-#build --cxxopt="-g" 
-#build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"
+build --copt="-g" 
+build --cxxopt="-g" 
+build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"
 
 
 # Suppress all warning messages.
