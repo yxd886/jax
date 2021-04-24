@@ -78,7 +78,7 @@ bazel_version_repository(name = "bazel_version")
 
 new_local_repository(
 name = "python_linux",
-path = "/home/net/.conda/envs/jax",
+path = "/userhome/cs/yxd888/anaconda2/envs/jax",
 build_file_content = """
 cc_library(
 name = "python37-lib",
@@ -93,7 +93,7 @@ visibility = ["//visibility:public"],
 
 new_local_repository(
 name = "openmpi",
-path = "/usr/local/openmpi",
+path = "/userhome/cs/yxd888/openmpi",
 build_file_content = """
 cc_library(
 name = "openmpi-lib",
@@ -107,13 +107,13 @@ visibility = ["//visibility:public"],
 
 new_local_repository(
 name = "opencurl",
-path = "/usr/",
+path = "/userhome/cs/yxd888/anaconda2",
 build_file_content = """
 cc_library(
 name = "curl-lib",
-srcs = ["lib/x86_64-linux-gnu/libcurl.so"],
-hdrs = glob(["include/x86_64-linux-gnu/curl/*.h"]),
-includes = ["include/x86_64-linux-gnu/curl"],
+srcs = ["lib/libcurl.so"],
+hdrs = glob(["include/curl/*.h"]),
+includes = ["include/curl"],
 visibility = ["//visibility:public"],
 )
 """
