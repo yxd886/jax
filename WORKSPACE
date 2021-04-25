@@ -97,7 +97,7 @@ path = "/userhome/cs/yxd888/openmpi",
 build_file_content = """
 cc_library(
 name = "openmpi-lib",
-srcs = ["lib/libmpi.so","lib/libmpi_mpifh.so"],
+srcs = ["lib/libmpi.so"],
 hdrs = glob(["include/*.h"]),
 includes = ["include"],
 visibility = ["//visibility:public"],
@@ -113,7 +113,7 @@ cc_library(
 name = "curl-lib",
 srcs = ["lib/libcurl.so"],
 hdrs = glob(["include/curl/*.h"]),
-includes = ["include/curl"],
+includes = ["include/curl","include"],
 visibility = ["//visibility:public"],
 )
 """
